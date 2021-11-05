@@ -1,0 +1,52 @@
+# to avoid line-endings-related issues
+* text=auto
+
+# Source code
+*.sh            text eol=lf
+*.py            text eol=lf
+*.gp            text eol=lf
+*.html          text diff=html
+Makefile        text eol=lf
+
+# Documentation
+*.markdown      text
+*.md            text
+*.mdwn          text
+*.mdown         text
+*.mkd           text
+*.mkdn          text
+*.mdtxt         text
+*.mdtext        text
+*.txt           text
+*.tex           text
+AUTHORS         text
+CHANGELOG       text
+CHANGES         text
+CONTRIBUTING    text
+COPYING         text
+copyright       text
+*COPYRIGHT*     text
+INSTALL         text
+license         text
+LICENSE         text
+NEWS            text
+readme          text
+*README*        text
+TODO            text
+
+# Graphics
+*.eps           binary eol=lf
+*.gif           binary eol=lf
+*.jpg           binary eol=lf
+*.jpeg          binary eol=lf
+*.pdf           binary eol=lf
+*.png           binary eol=lf
+*.svg           binary eol=lf
+
+# Archives
+*.7z            binary
+*.gz            binary
+*.jar           binary
+*.rar           binary
+*.tar           binary
+*.zip           binary

@@ -1,0 +1,8 @@
+preserve.keys=on
+preserve.key.case=on
+suppress.initial.newline=on
+print.use.tab=off
+print.line.length=1000000
+check.double=on
+sort=off
+delete.field { abstract annote file mendeley-groups month }

@@ -1,0 +1,52 @@
+\RequirePackage{snapshot}
+\documentclass[a4paper,10pt,twocolumn]{article}
+\pagestyle{plain}
+\usepackage{amsmath,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{subcaption}
+\usepackage{cleveref}
+\usepackage[inline]{enumitem}
+\usepackage{todonotes}
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage[htt]{hyphenat}
+\usepackage{textcomp}
+
+\newcommand{\midtilde}{\raisebox{-0.25\baselineskip}{\textasciitilde}}
+
+\begin{document}
+
+\title{
+    Paper Title
+}
+
+\author{Giacomo Lanciano}
+% \affiliation{
+%     \institution{Scuola Normale Superiore}
+%     \city{Pisa}
+%     \country{Italy}
+% }
+% \email{giacomo.lanciano@sns.it}
+% \orcid{0000-0002-7431-8041}
+
+\maketitle
+
+\begin{abstract}
+    \input{abstract}
+\end{abstract}
+
+\input{intro}
+\input{relwork}
+\input{background}
+\input{approach}
+\input{experiments}
+\input{conclusions}
+
+\bibliographystyle{plain}
+\bibliography{biblio-nourl}
+
+\end{document}
