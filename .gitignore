@@ -3,7 +3,8 @@
 #######################################
 
 biblio-nourl.bib
-main.pdf
+main*-nourl.tex
+main*.pdf
 main*.zip
 main/
 *_arXiv/
