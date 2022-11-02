@@ -1,0 +1,38 @@
+name: Build
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (GitHub)
+        uses: actions/checkout@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and run dev container task
+        uses: devcontainers/ci@v0.2
+        with:
+          # imageName: ghcr.io/${{ github.repository }}  # to cache the image
+          push: never
+          runCmd: |
+            make config
+            make all
+
+      - name: Upload manuscript
+        uses: actions/upload-artifact@v3
+        with:
+          name: manuscript
+          path: main.pdf
+
+      - name: Upload abstract
+        uses: actions/upload-artifact@v3
+        with:
+          name: abstract
+          path: main-abstract.pdf
