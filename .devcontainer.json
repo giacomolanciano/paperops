@@ -1,0 +1,31 @@
+{
+    "image": "ghcr.io/giacomolanciano/devcontainer-latex:v1.0.0",
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:1": {
+            "installZsh": false,
+            // "username": "vscode",
+            // "uid": "1000",
+            // "gid": "1000",
+            "upgradePackages": false
+        }
+    },
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+    // "forwardPorts": [],
+
+    // Use 'postCreateCommand' to run commands after the container is created.
+    "postCreateCommand": "make config",
+
+    // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+    "remoteUser": "vscode",
+    "updateRemoteUserUID": true,
+
+    // Set *default* container specific settings.json values on container create.
+    "settings": {
+        "terminal.integrated.profiles.linux":{
+            "bash": {
+                "path": "/bin/bash"
+            }
+        },
+        "terminal.integrated.defaultProfile.linux": "bash"
+    }
+}
