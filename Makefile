@@ -1,19 +1,43 @@
 MAIN=main
 PAPERS=$(MAIN)
+PDFLATEX_ARGS := pdflatex -synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error --shell-escape
 
-.PHONY: all clean clean-archive clean-bib clean-diff archive bib-fmt FORCE
-.PRECIOUS: $(MAIN)-diff-%.tex
+.PHONY: all main abstract clean clean-archive clean-bib clean-diff archive bib-fmt draft config FORCE
+.PRECIOUS: $(MAIN)-diff-%.tex %-nourl.tex
 
-all: $(MAIN).pdf
+main: $(MAIN).pdf
 
-%.pdf: %.tex biblio-nourl.bib FORCE
-	latexmk -pdflatex='pdflatex -file-line-error -synctex=1' -bibtex -pdf $<
+abstract: $(MAIN)-abstract.pdf
+
+all: main abstract
+
+## As it is possible to edit the paper also from Overleaf, we need to
+## apply the following configs to have utility scripts working locally.
+## Indeed, Overleaf will eventually turn off the executable bits of
+## every file for security reasons, so we make Git ignore changes in
+## executable bits (for this repo only) and set them properly.
+config:
+	git config --local core.fileMode false
+	find . -iregex ".*\.sh" -exec chmod +x {} +
+
+%-nourl.tex: %.tex
+	sed -e 's/biblio\.bib/biblio-nourl\.bib/' -e 's/,biblio/,biblio-nourl/' -e 's/{biblio}/{biblio-nourl}/' $< > $@
+
+%.pdf: %-nourl.tex biblio-nourl.bib FORCE
+	latexmk -pdflatex="$(PDFLATEX_ARGS)" -bibtex -pdf -jobname=$(basename $@) $<
 
 	@ if [ -n "$(strip $(findstring -diff-,$@))" ]; then \
 		printf "\nWARNING: latexdiff is set to ignore diffs in tables, you have to check them manually.\n"; \
 	fi
 
+draft: $(MAIN)-nourl.tex biblio-nourl.bib FORCE
+	latexmk -pdflatex="$(PDFLATEX_ARGS) %O '\def\Draft{}\input{%S}'" -bibtex -pdf -jobname=$(MAIN) $<
+
 biblio-nourl.bib: biblio.bib
+	@ if [ ! -x scripts/create-biblio-nourl.sh ]; then \
+		printf "\nERROR: the script required to generate '$@' is not executable. Run 'make config' to fix it.\n\n"; \
+		exit 1; \
+	fi
 	scripts/create-biblio-nourl.sh $< > $@
 
 clean: clean-archive clean-bib clean-diff
@@ -59,6 +83,7 @@ bib-fmt: biblio.bib
 ## diffs in tables are not always handled correctly, so we ignore them altogether.
 define diff_templ
 $(1)-diff-%.tex: /tmp/diff-%.dir
+	cd $(patsubst /tmp/diff-%-nourl.dir,/tmp/diff-%.dir,$$<) && make clean; make config; make
 	latexdiff --config="PICTUREENV=(?:picture|DIFnomarkup|table)[\w\d*@]*" --flatten $$</$(1).tex $(1).tex > $$@
 endef
 
@@ -66,6 +91,6 @@ $(foreach p,$(PAPERS),$(eval $(call diff_templ,$(p))))
 
 /tmp/diff-%.dir:
 	git clone --reference $(shell git rev-parse --show-toplevel) \
-	$(shell git remote -v | grep origin | grep fetch | sed -e 's/origin[[:blank:]]\+//' -e 's/ (fetch)//') $@ \
-	&& cd $@ \
-	&& git checkout $(patsubst /tmp/diff-%.dir,%,$@)
+	$(shell git remote -v | grep origin | grep fetch | sed -e 's/origin[[:blank:]]\+//' -e 's/ (fetch)//') $(patsubst /tmp/diff-%-nourl.dir,/tmp/diff-%.dir,$@) \
+	&& cd $(patsubst /tmp/diff-%-nourl.dir,/tmp/diff-%.dir,$@) \
+	&& git checkout $(patsubst /tmp/diff-%-nourl.dir,%,$@)
