@@ -19,13 +19,25 @@
     "remoteUser": "vscode",
     "updateRemoteUserUID": true,
 
-    // Set *default* container specific settings.json values on container create.
-    "settings": {
-        "terminal.integrated.profiles.linux":{
-            "bash": {
-                "path": "/bin/bash"
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "james-yu.latex-workshop",
+                "ms-vscode.wordcount",
+                "shardulm94.trailing-spaces",
+                "stevensona.character-count",
+                "stkb.rewrap",
+                "tecosaur.latex-utilities",
+                "valentjn.vscode-ltex"
+            ],
+            "settings": {
+                "terminal.integrated.profiles.linux":{
+                    "bash": {
+                        "path": "/bin/bash"
+                    }
+                },
+                "terminal.integrated.defaultProfile.linux": "bash"
             }
-        },
-        "terminal.integrated.defaultProfile.linux": "bash"
+        }
     }
 }
