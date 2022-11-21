@@ -1,8 +1,10 @@
 MAIN=main
 PAPERS=$(MAIN)
 PDFLATEX_ARGS := pdflatex -synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error --shell-escape
+MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+CURRENT_DIR := $(notdir $(patsubst %/,%,$(dir $(MAKEFILE_PATH))))
 
-.PHONY: all main abstract clean clean-archive clean-bib clean-diff archive bib-fmt draft config FORCE
+.PHONY: all main abstract clean clean-archive clean-bib clean-diff archive bib-fmt draft config build-dc FORCE
 .PRECIOUS: $(MAIN)-diff-%.tex %-nourl.tex
 
 main: $(MAIN).pdf
@@ -94,3 +96,12 @@ $(foreach p,$(PAPERS),$(eval $(call diff_templ,$(p))))
 	$(shell git remote -v | grep origin | grep fetch | sed -e 's/origin[[:blank:]]\+//' -e 's/ (fetch)//') $(patsubst /tmp/diff-%-nourl.dir,/tmp/diff-%.dir,$@) \
 	&& cd $(patsubst /tmp/diff-%-nourl.dir,/tmp/diff-%.dir,$@) \
 	&& git checkout $(patsubst /tmp/diff-%-nourl.dir,%,$@)
+
+## Type `make build-dc` to trigger the build within the existing devcontainer
+## directly from the host (i.e., no need to open the editor and attach).
+## NOTE: 'jq' and 'python3-demjson' must be installed on the host to correctly
+## parse the devcontainer name from '.devcontainer.json'.
+build-dc:
+	docker exec -it -u vscode -w /workspaces/$(CURRENT_DIR) \
+		$(shell jsonlint -Sf .devcontainer.json | jq -r '.runArgs[]' | grep '^\-\-name\=' | cut -d'=' -f2) \
+		make

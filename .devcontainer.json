@@ -1,4 +1,5 @@
 {
+    "runArgs": ["--name=latex-paper-template"],
     "image": "ghcr.io/giacomolanciano/devcontainer-latex:v1.4.0",
     "features": {
         "ghcr.io/devcontainers/features/common-utils:1": {
