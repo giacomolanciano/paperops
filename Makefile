@@ -93,7 +93,8 @@ $(foreach p,$(PAPERS),$(eval $(call diff_templ,$(p))))
 
 /tmp/diff-%.dir:
 	git clone --reference $(shell git rev-parse --show-toplevel) \
-	$(shell git remote -v | grep origin | grep fetch | sed -e 's/origin[[:blank:]]\+//' -e 's/ (fetch)//') $(patsubst /tmp/diff-%-nourl.dir,/tmp/diff-%.dir,$@) \
+		$(shell git remote -v | grep origin | grep fetch | sed -e 's/origin[[:blank:]]\+//' -e 's/ (fetch)//') \
+		$(patsubst /tmp/diff-%-nourl.dir,/tmp/diff-%.dir,$@) \
 	&& cd $(patsubst /tmp/diff-%-nourl.dir,/tmp/diff-%.dir,$@) \
 	&& git checkout $(patsubst /tmp/diff-%-nourl.dir,%,$@)
 
