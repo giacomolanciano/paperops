@@ -1,5 +1,4 @@
 MAIN=main
-PAPERS=$(MAIN)
 PDFLATEX_ARGS := pdflatex -synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error --shell-escape
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(notdir $(patsubst %/,%,$(dir $(MAKEFILE_PATH))))
@@ -28,10 +27,6 @@ config:
 %.pdf: %-nourl.tex biblio-nourl.bib FORCE
 	latexmk -pdflatex="$(PDFLATEX_ARGS)" -bibtex -pdf -jobname=$(basename $@) $<
 
-	@ if [ -n "$(strip $(findstring -diff-,$@))" ]; then \
-		printf "\nWARNING: latexdiff is set to ignore diffs in tables, you have to check them manually.\n"; \
-	fi
-
 draft: $(MAIN)-nourl.tex biblio-nourl.bib FORCE
 	latexmk -pdflatex="$(PDFLATEX_ARGS) %O '\def\Draft{}\input{%S}'" -bibtex -pdf -jobname=$(MAIN) $<
 
@@ -52,7 +47,7 @@ clean-bib:
 	rm -f biblio-nourl.bib
 
 clean-diff:
-	rm -f *-diff-*
+	rm -rf *-diff-*
 
 ## Type `make archive` to generate a .zip containing all the files that are
 ## strictly necessary to compile the document (i.e., images and other material
@@ -83,20 +78,21 @@ bib-fmt: biblio.bib
 ## between <commit-id> and HEAD.
 ## NOTE: due to a latexdiff bug (https://github.com/ftilmann/latexdiff/issues/5),
 ## diffs in tables are not always handled correctly, so we ignore them altogether.
-define diff_templ
-$(1)-diff-%.tex: /tmp/diff-%.dir
-	cd $(patsubst /tmp/diff-%-nourl.dir,/tmp/diff-%.dir,$$<) && make clean; make config; make
-	latexdiff --config="PICTUREENV=(?:picture|DIFnomarkup|table)[\w\d*@]*" --flatten $$</$(1).tex $(1).tex > $$@
-endef
+$(MAIN)-diff-%.pdf: $(MAIN)-diff-%.tex $(MAIN).pdf FORCE
+	latexmk -pdflatex="$(PDFLATEX_ARGS)" -bibtex -pdf -jobname=$(basename $@) $<
 
-$(foreach p,$(PAPERS),$(eval $(call diff_templ,$(p))))
+	@printf "\nWARNING: latexdiff is set to ignore diffs in tables, you have to check them manually.\n"
+
+$(MAIN)-diff-%.tex: /tmp/diff-%.dir
+	cd $< && make clean; make config; make
+	latexdiff --config="PICTUREENV=(?:picture|DIFnomarkup|table)[\w\d*@]*" --flatten \
+		$</$(MAIN).tex $(MAIN).tex > $@
 
 /tmp/diff-%.dir:
 	git clone --reference $(shell git rev-parse --show-toplevel) \
-		$(shell git remote -v | grep origin | grep fetch | sed -e 's/origin[[:blank:]]\+//' -e 's/ (fetch)//') \
-		$(patsubst /tmp/diff-%-nourl.dir,/tmp/diff-%.dir,$@) \
-	&& cd $(patsubst /tmp/diff-%-nourl.dir,/tmp/diff-%.dir,$@) \
-	&& git checkout $(patsubst /tmp/diff-%-nourl.dir,%,$@)
+		$(shell git remote -v | grep origin | grep fetch | sed -e 's/origin[[:blank:]]\+//' -e 's/ (fetch)//') $@ \
+	&& cd $@ \
+	&& git checkout $(patsubst /tmp/diff-%.dir,%,$@)
 
 ## Type `make build-dc` to trigger the build within the existing devcontainer
 ## directly from the host (i.e., no need to open the editor and attach).
