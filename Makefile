@@ -5,7 +5,7 @@ CURRENT_DIR := $(notdir $(patsubst %/,%,$(dir $(MAKEFILE_PATH))))
 ## Standard `latexmk` call
 PDFLATEX_ARGS := pdflatex -synctex=1 -interaction=nonstopmode -halt-on-error -file-line-error --shell-escape
 define LATEXMK_PDFLATEX
-    latexmk -pdflatex="$(PDFLATEX_ARGS)" -bibtex -pdf -jobname=$(basename $(1)) $(2)
+	latexmk -pdflatex="$(PDFLATEX_ARGS)" -bibtex -pdf -jobname=$(basename $(1)) $(2)
 endef
 
 .PHONY: all main abstract clean clean-archive clean-bib clean-diff archive bib-fmt draft config build-dc FORCE
