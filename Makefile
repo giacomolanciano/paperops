@@ -88,6 +88,9 @@ arxiv: archive
 ## corresponding .bbl files are available and the biblio can be included in the
 ## flattened diff. Therefore, the 'nourl' versions of the biblio are considered
 ## by default.
+## In case of build errors, it is still possible to manually fix `latexdiff`'s
+## .tex output and re-trigger the build with the same command (the .tex file
+## won't be overwritten).
 ##
 ## NOTE: due to a latexdiff bug (https://github.com/ftilmann/latexdiff/issues/5),
 ## diffs in tables are not always handled correctly, so we ignore them altogether.
