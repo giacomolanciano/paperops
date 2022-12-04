@@ -82,8 +82,8 @@ arxiv: archive
 	zip -r $(MAIN)_arXiv.zip $(MAIN)/
 	rm -r $(MAIN)/
 
-## Type `make main-diff-<commit-id>.pdf` to get a .pdf showing the differences
-## between <commit-id> and HEAD.
+## Type `make main-diff-<COMMIT-ID>.pdf` to get a .pdf showing the differences
+## between <COMMIT-ID> and HEAD.
 ## Both versions are built (if needed) before using `latexdiff`, such that the
 ## corresponding .bbl files are available and the biblio can be included in the
 ## flattened diff. Therefore, the 'nourl' versions of the biblio are considered
