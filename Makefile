@@ -67,12 +67,22 @@ clean-diff:
 ## that are not actually referenced in .tex files will not be included).
 ## This is useful for preparing a camera-ready submission that do not disclose
 ## potentially sensitive material.
-archive: $(MAIN).pdf
-	bundledoc --config=.bundledoc.cfg --localonly --manifest="" \
-	--exclude=.out \
-	--include=*.bib \
-	--include=*.bst \
-	$(MAIN).dep
+##
+## NOTE: the .dep file produced by the 'snapshot' package may also list temporary
+## files produced, and deleted, during the build. Such temporary files are not
+## required to build, but 'bundledoc' fails to create the archive as they are
+## listed but not found. As a workaround, we remove the related lines from the
+## .dep file before using 'bundledoc'.
+archive: $(MAIN).dep $(MAIN).pdf
+	sed -i -e '/\.w18"}/d' $<
+	bundledoc --config=.bundledoc.cfg \
+		--texfile=$(MAIN).tex \
+		--manifest="" \
+		--localonly \
+		--exclude=.out \
+		--include=*.bib \
+		--include=*.bst \
+		$<
 
 ## Type `make arxiv` to generate a .zip, similar to the output of `make archive`,
 ## that can be used for an arXiv submission.
