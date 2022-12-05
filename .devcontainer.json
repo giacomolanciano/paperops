@@ -23,6 +23,7 @@
     "customizations": {
         "vscode": {
             "extensions": [
+                "eamodio.gitlens",
                 "james-yu.latex-workshop",
                 "ms-vscode.wordcount",
                 "shardulm94.trailing-spaces",
