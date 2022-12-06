@@ -16,6 +16,7 @@ A comprehensive template repository for academic paper writing with LaTeX.
 ## Dependencies
 
 The features provided by this template depend on tools such as:
+[`make`](https://www.gnu.org/software/make/),
 [`latexmk`](https://ctan.org/pkg/latexmk),
 [`bibtool`](https://www.ctan.org/pkg/bibtool),
 [`latexdiff`](https://www.ctan.org/pkg/latexdiff),
@@ -31,7 +32,7 @@ possible to manually start the container:
 $ docker pull ghcr.io/giacomolanciano/devcontainer-latex:<VERSION>
 ...
 $ docker run -it \
-    -u vscode
+    -u vscode \
     -e UID=$(id -u) \
     -e GID=$(id -g) \
     -v </PATH/TO/LATEX/PROJECT>:/workspaces/<LATEX-PROJECT-NAME> \
@@ -59,8 +60,9 @@ In order to start a new LaTeX project from this template:
     - To enable collaboration via Overleaf, it is recommended to use the associated Git repo as `origin`, to also track
       the changes made via the web GUI. Consider that Overleaf only allows for having a single branch, and force-pushing
       is not permitted.
-    - To use the GitHub Actions, it is necessary to setup a GitHub remote, that can possibly be maintained beside the
-      Overleaf one.
+    - To use the GitHub Actions, it is necessary to setup a GitHub remote. If collaboration via Overleaf is enabled, it
+      is recommended not to share push access to the GitHub remote with collaborators, to avoid confusion. The GitHub
+      remote will have to be *manually* synced to align with the latest version on Overleaf.
     - Before pushing, it is recommended to use `git pull --rebase` to keep the history linear and prevent the push from
       being rejected by the Overleaf remote.
 
@@ -72,22 +74,32 @@ a new GitHub remote from this template. However, consider that enabling Overleaf
 
 The included [Makefile](Makefile) provides the following commands:
 
-| Command                          | Description                                                                                       |
-| :------------------------------- | :------------------------------------------------------------------------------------------------ |
-| `make`                           | Build `main.pdf`, the complete manuscript                                                         |
-| `make main<SUFFIX>.pdf`          | Build a PDF from `main<SUFFIX>.tex`, useful to maintain multiple conference/journal templates     |
-| `make abstract`                  | Build `main-abstract.pdf`, a document containing title and abstract only                          |
-| `make all`                       | Build both `main.pdf` and `main-abstract.pdf`                                                     |
-| `make draft`                     | Build `main.pdf` in draft mode, useful to make editing faster (e.g., when there are many figures) |
-| `make config`                    | Apply initial configurations                                                                      |
-| `make bib-fmt`                   | Format `biblio.bib`                                                                               |
-| `make main-diff-<COMMIT-ID>.pdf` | Build a PDF highlighting the differences between the current and the `<COMMIT-ID>` version        |
-| `make archive`                   | Generate a .zip containing all the files that are strictly necessary to build `main.pdf`          |
-| `make arxiv`                     | Generate a .zip, similar to the output of `make archive`, ready for an arXiv submission           |
-| `make clean`                     | Remove all auto-generated files                                                                   |
-| `make build-dc`                  | Trigger the build within the **existing** devcontainer directly from the host                     |
+| Command                          | Description                                                                                                |
+| :------------------------------- | :--------------------------------------------------------------------------------------------------------- |
+| `make`                           | Build `main.pdf`, the complete manuscript.                                                                 |
+| `make main<SUFFIX>.pdf`          | Build a PDF from `main<SUFFIX>.tex`, useful to maintain multiple versions with different document classes. |
+| `make abstract`                  | Build `main-abstract.pdf`, a document containing title and abstract only.                                  |
+| `make all`                       | Build both `main.pdf` and `main-abstract.pdf`.                                                             |
+| `make draft`                     | Build `main.pdf` in draft mode, useful to make editing faster (e.g., when there are many figures).         |
+| `make config`                    | Apply initial configurations.                                                                              |
+| `make bib-fmt`                   | Format `biblio.bib`.                                                                                       |
+| `make main-diff-<COMMIT-ID>.pdf` | Build a PDF highlighting the differences between the current and the `<COMMIT-ID>` version.                |
+| `make archive`                   | Generate a .zip containing all the files that are strictly necessary to build `main.pdf`.                  |
+| `make arxiv`                     | Generate a .zip, similar to the output of `make archive`, ready for an arXiv submission.                   |
+| `make clean`                     | Remove all auto-generated files.                                                                           |
+| `make build-dc`                  | Trigger the build within the **existing** devcontainer directly from the host.                             |
 
-### Using publishers-provided document classes
+## FAQs
+
+### Why do I see `main-nourl.tex` and `biblio-nourl.bib` being generated when building?
+
+By default, the build process triggered by `make` generates a compact version of the bibliography, by removing URLs
+deemed [unnecessary](scripts/create-biblio-nourl.sh). However, since Overleaf does not support custom `Makefile`s, we
+generate alternative versions of the main document and the bibliography, that are the ones actually used to build
+`main.pdf`. In this way, collaborators working from Overleaf can still have the manuscript built, although with the
+non-compact version of the bibliography.
+
+### How to use publishers-provided document classes?
 
 For simplicity, this template is set to use the standard `article` document class. However, it should be fairly easy to
 switch to alternative classes, such as those provided by publishers like
@@ -96,7 +108,7 @@ switch to alternative classes, such as those provided by publishers like
 
 To have this template working with another document class, make sure to:
 
-- Include the `\usepackage{...}` instructions in the same order as they appear in this template.
+- Include the `\usepackage{...}` instructions in the **same order** as they appear in this template.
 - Include the following instruction as the **first line** to use the archiving features:
 
     ```latex
@@ -115,6 +127,16 @@ To have this template working with another document class, make sure to:
 package, that is included in [`devcontainer-latex`](https://github.com/giacomolanciano/devcontainer-latex). However, to
 ensure portability, it is recommended to copy their relevant source files (e.g., `*.bst`, `*.cls`, `*.sty`, etc.) in the
 project.
+
+### Why can't I interact with my Git remote, via SSH, from the devcontainer?
+
+If the container is automatically created with VS Code, it is probably enough to set the `ssh-agent` running on the
+host to [share](https://code.visualstudio.com/docs/devcontainers/containers#_using-ssh-keys) the required SSH keys with
+the container (**NOTE:** it may be necessary to re-build the container).
+
+However, if the container is started [manually](#dependencies), the connection with the `ssh-agent` running on the
+host is not automatically set. In this case, it is always possible to run Git remote-related commands directly from the
+host.
 
 ## Acknowledgments
 
