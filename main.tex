@@ -68,6 +68,11 @@
 \input{conclusions}
 
 \bibliographystyle{plain}
-\bibliography{biblio.bib}
+%
+% NOTE: biblio-nourl is not explicitly included to allow for editing from
+% Overleaf (that do not support our Makefile). However, compiling with `make`
+% will automatically switch to biblio-nourl, and generate a more compact PDF
+% by removing URLs from entries like conference/journal papers.
+\bibliography{biblio}
 
 \end{document}
