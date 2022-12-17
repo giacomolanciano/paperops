@@ -1,8 +1,10 @@
-# latex-paper-template
+# PaperOps
 
-A comprehensive template repository for academic paper writing with LaTeX.
+Where academic LaTeX paper writing meets DevOps.
 
 ## Features
+
+This repository consists in a LaTeX project template providing the following features:
 
 - Support for a hybrid local/[Overleaf](https://overleaf.com/) collaboration workflow.
 - Support for a [devcontainer](https://containers.dev/)-based workflow, [batteries included](https://github.com/giacomolanciano/devcontainer-latex).
@@ -140,9 +142,9 @@ host.
 
 ## Acknowledgments
 
-This project is maintained by [Giacomo Lanciano](https://github.com/giacomolanciano). It has been developed and
-battle-tested during his PhD, with (way more than) a little help from [Tommaso Cucinotta](https://retis.sssup.it/~tommaso/eng/index.html).
+Maintained by [Giacomo Lanciano](https://github.com/giacomolanciano). This project has been developed and battle-tested
+during his PhD, with (way more than) a little help from [Tommaso Cucinotta](https://retis.sssup.it/~tommaso/eng/index.html).
 
 ## License
 
-Distributed under the [MIT License](https://github.com/giacomolanciano/latex-paper-template/blob/master/LICENSE).
+Distributed under the [MIT License](https://github.com/giacomolanciano/paperops/blob/master/LICENSE).
