@@ -1,6 +1,6 @@
 {
     "runArgs": ["--name=paperops"],
-    "image": "ghcr.io/giacomolanciano/devcontainer-latex:v1.6.0",
+    "image": "ghcr.io/giacomolanciano/devcontainer-latex:v1.7.0",
     "features": {
         "ghcr.io/devcontainers/features/common-utils:1": {
             "installZsh": false,
