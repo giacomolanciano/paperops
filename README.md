@@ -87,7 +87,7 @@ The included [Makefile](Makefile) provides the following commands:
 | `make bib-fmt`                   | Format `biblio.bib`.                                                                                       |
 | `make main-diff-<COMMIT-ID>.pdf` | Build a PDF highlighting the differences between the current and the `<COMMIT-ID>` version.                |
 | `make archive`                   | Generate a .zip containing all the files that are strictly necessary to build `main.pdf`.                  |
-| `make arxiv`                     | Generate a .zip, similar to the output of `make archive`, ready for an arXiv submission.                   |
+| `make archive-safe`              | Similar to `make archive`, also strip comments from source files (e.g., for arXiv submissions).            |
 | `make clean`                     | Remove all auto-generated files.                                                                           |
 | `make build-dc`                  | Trigger the build within the **existing** devcontainer directly from the host.                             |
 

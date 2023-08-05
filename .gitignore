@@ -7,9 +7,11 @@ main*-nourl.tex
 main*.pdf
 main*.zip
 main/
+main-safe/
 *_arXiv/
 *.dep
 *-diff-*
+**/*_svg-tex.*
 
 #######################################
 ## LaTeX
@@ -101,7 +103,7 @@ acs-*.bib
 *.mp
 *.t[1-9]
 *.t[1-9][0-9]
-*.tfm
+# *.tfm
 
 #(r)(e)ledmac/(r)(e)ledpar
 *.end

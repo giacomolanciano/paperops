@@ -1,4 +1,6 @@
 MAIN := main
+BIB_FILES := biblio.bib
+BIB_NOURL_FILES := $(foreach bib_file,$(BIB_FILES),$(basename $(bib_file))-nourl.bib)
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(notdir $(patsubst %/,%,$(dir $(MAKEFILE_PATH))))
 
@@ -17,16 +19,23 @@ abstract: $(MAIN)-abstract.pdf
 
 all: main abstract
 
-%.pdf: %-nourl.tex biblio-nourl.bib FORCE
+%.pdf: %-nourl.tex $(BIB_NOURL_FILES) FORCE
 	$(call LATEXMK_PDFLATEX,$@,$<)
 
-draft: $(MAIN)-nourl.tex biblio-nourl.bib FORCE
+draft: $(MAIN)-nourl.tex $(BIB_NOURL_FILES) FORCE
 	latexmk -pdflatex="$(PDFLATEX_ARGS) %O '\def\Draft{}\input{%S}'" -bibtex -pdf -jobname=$(MAIN) $<
 
 %-nourl.tex: %.tex
-	sed -e 's/biblio\.bib/biblio-nourl\.bib/' -e 's/,biblio/,biblio-nourl/' -e 's/{biblio}/{biblio-nourl}/' $< > $@
+	cp -a $< $@
+	for bib_file_basename in $(foreach bib_file,$(BIB_FILES),$(basename $(bib_file))); do \
+		sed -i \
+			-e "s/$${bib_file_basename}\.bib/$${bib_file_basename}-nourl\.bib/" \
+			-e "s/,$${bib_file_basename}/,$${bib_file_basename}-nourl/" \
+			-e "s/{$${bib_file_basename}}/{$${bib_file_basename}-nourl}/" \
+			$@; \
+	done
 
-biblio-nourl.bib: biblio.bib
+%-nourl.bib: %.bib
 	@ if [ ! -x scripts/create-biblio-nourl.sh ]; then \
 		printf "\nERROR: the script required to generate '$@' is not executable. Run 'make config' to fix it.\n\n"; \
 		exit 1; \
@@ -42,22 +51,26 @@ config:
 	git config --local core.fileMode false
 	find . -iregex ".*\.sh" -exec chmod +x {} +
 
-## Type `make bib-fmt` to have 'biblio.bib' formatted according to the rules
+## Type `make bib-fmt` to have BIB_FILES formatted according to the rules
 ## defined in '.bibtoolrsc'.
-bib-fmt: biblio.bib
+bib-fmt: $(BIB_FILES)
 	$(eval $@_temp_bib := $(shell mktemp -t bib-tmp.XXXXXXXXXX.bib))
-	bibtool -r .bibtoolrsc -@ -i $< > $($@_temp_bib)
-	mv $($@_temp_bib) $<
+	for bib_file in $(BIB_FILES); do \
+		echo "Formatting '$$bib_file'..."; \
+		bibtool -r .bibtoolrsc -@ -i $$bib_file > $($@_temp_bib); \
+		mv $($@_temp_bib) $$bib_file; \
+		echo; \
+	done
 
 ## Type `make clean` to remove all auto-generated files.
 clean: clean-archive clean-bib clean-diff
 	latexmk -C
 
 clean-archive:
-	rm -rf $(MAIN).zip $(MAIN)_arXiv.zip $(MAIN)_arXiv
+	rm -rf $(MAIN).zip $(MAIN)/ $(MAIN)-safe.zip $(MAIN)-safe/ $(MAIN)_arXiv.zip $(MAIN)_arXiv/
 
 clean-bib:
-	rm -f biblio-nourl.bib
+	rm -f *-nourl.bib
 
 clean-diff:
 	rm -rf *-diff-*
@@ -82,15 +95,23 @@ archive: $(MAIN).dep $(MAIN).pdf
 		--exclude=.out \
 		--include=*.bib \
 		--include=*.bst \
+		--include=*.fd \
+		--include=*.map \
+		--include=*.pfb \
+		--include=*.tfm \
 		$<
 
-## Type `make arxiv` to generate a .zip, similar to the output of `make archive`,
-## that can be used for an arXiv submission.
-arxiv: archive
+## Type `make archive-safe` to generate a .zip, similar to the output of `make archive`,
+## but with all comments stripped down from .tex files (e.g., for an arXiv submission).
+##
+## NOTE: due to how `arxiv_latex_cleaner` filter the source files, .pdf files generated
+## from .eps file must be manually copied over.
+archive-safe: clean-archive archive
 	unzip -o $(MAIN).zip
-	arxiv_latex_cleaner $(MAIN)/
-	zip -r $(MAIN)_arXiv.zip $(MAIN)/
-	rm -r $(MAIN)/
+	arxiv_latex_cleaner --keep_bib $(MAIN)/
+	mv $(MAIN)_arXiv/ $(MAIN)-safe/
+	cp -f img/*-eps-converted-to.pdf $(MAIN)-safe/img/ || true
+	zip -r $(MAIN)-safe.zip $(MAIN)-safe/
 
 ## Type `make main-diff-<COMMIT-ID>.pdf` to get a .pdf showing the differences
 ## between <COMMIT-ID> and HEAD.
